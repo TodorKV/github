@@ -18,6 +18,7 @@ public class GithubClientMocks {
     private static final String MOCK_GITHUB_CLIENT_GET_USER_SUCCESS_RESPONSE = "wiremock/github-client-get-user-success-response.json";
     private static final String MOCK_GITHUB_CLIENT_GET_BRANCHES_SUCCESS_RESPONSE = "wiremock/github-client-get-branches-success-response.json";
     private static final String MOCK_GITHUB_CLIENT_GET_REPOS_SUCCESS_RESPONSE = "wiremock/github-client-get-repositories-success-response.json";
+    private static final String MOCK_GITHUB_CLIENT_GET_REPOS_FAILURE_RESPONSE = "wiremock/github-client-get-repositories-failure-response.json";
 
     public void mockGithubClientGetUserSuccessResponse(WireMockServer mockServer) throws IOException {
         stubForGetSuccessResponse("/users/username", mockServer, HttpStatus.OK,
@@ -32,6 +33,11 @@ public class GithubClientMocks {
     public void mockGithubClientGetReposSuccessResponse(WireMockServer mockServer) throws IOException {
         stubForGetSuccessResponse("/users/username/repos", mockServer, HttpStatus.OK,
                 MOCK_GITHUB_CLIENT_GET_REPOS_SUCCESS_RESPONSE);
+    }
+
+    public void mockGithubClientGetReposFailureResponse(WireMockServer mockServer) throws IOException {
+        stubForGetSuccessResponse("/users/username/repos", mockServer, HttpStatus.NOT_FOUND,
+                MOCK_GITHUB_CLIENT_GET_REPOS_FAILURE_RESPONSE);
     }
 
     private void stubForGetSuccessResponse(
