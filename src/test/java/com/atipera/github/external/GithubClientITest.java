@@ -37,10 +37,6 @@ public class GithubClientITest {
     void init() throws IOException {
         wireMockServer = new WireMockServer(8888);
         wireMockServer.start();
-
-        githubClientMocks.mockGithubClientGetUserSuccessResponse(wireMockServer);
-        githubClientMocks.mockGithubClientGetBranchesSuccessResponse(wireMockServer);
-        githubClientMocks.mockGithubClientGetReposSuccessResponse(wireMockServer);
     }
 
     @AfterAll
@@ -53,6 +49,7 @@ public class GithubClientITest {
     @Test
     void getUser_expectNoErrors() throws IOException {
         // given
+        githubClientMocks.mockGithubClientGetUserSuccessResponse(wireMockServer);
         String login = "username";
 
         // when
@@ -64,8 +61,9 @@ public class GithubClientITest {
     }
 
     @Test
-    void getUser_expectErrors() {
+    void getUser_expectErrors() throws IOException {
         // given
+        githubClientMocks.mockGithubClientGetUserSuccessResponse(wireMockServer);
         String login = "noUser";
 
         // when then
@@ -75,6 +73,7 @@ public class GithubClientITest {
     @Test
     void getBranches_expectNoErrors() throws IOException {
         // given
+        githubClientMocks.mockGithubClientGetBranchesSuccessResponse(wireMockServer);
         // when
         List<Branch> branches = githubService.getRepositoryBranches("username", "repo");
 
@@ -84,8 +83,9 @@ public class GithubClientITest {
     }
 
     @Test
-    void getBranches_expectErrors() {
+    void getBranches_expectErrors() throws IOException {
         // given
+        githubClientMocks.mockGithubClientGetBranchesSuccessResponse(wireMockServer);
         // when then
         assertThrows(GithubRestException.class,
                 () -> githubService.getRepositoryBranches("username", "noRepo"));
@@ -94,6 +94,7 @@ public class GithubClientITest {
     @Test
     void getRepos_expectNoErrors() throws IOException {
         // given
+        githubClientMocks.mockGithubClientGetReposSuccessResponse(wireMockServer);
         // when
         List<Repository> repositories = githubService.getUserRepositories("username");
 
@@ -103,9 +104,18 @@ public class GithubClientITest {
     }
 
     @Test
-    void getRepos_expectErrors() {
+    void getRepos_expectErrors() throws IOException {
         // given
+        githubClientMocks.mockGithubClientGetReposSuccessResponse(wireMockServer);
         // when then
         assertThrows(GithubRestException.class, () -> githubService.getUserRepositories("noUser"));
+    }
+
+    @Test
+    void getRepos_expectErrorsNotFound() throws IOException {
+        // given
+        githubClientMocks.mockGithubClientGetReposFailureResponse(wireMockServer);
+        // when then
+        assertThrows(GithubRestException.class, () -> githubService.getUserRepositories("username"));
     }
 }
