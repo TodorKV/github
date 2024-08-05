@@ -2,16 +2,4 @@ package com.atipera.github.api.model;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RepositoriesResponse {
-
-    List<RepositoryResponse> repositories;
-}
+public record RepositoriesResponse(List<RepositoryResponse> repositories) {}

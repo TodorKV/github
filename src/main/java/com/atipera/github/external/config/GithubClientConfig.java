@@ -19,6 +19,9 @@ import feign.httpclient.ApacheHttpClient;
 @Import(FeignClientsConfiguration.class)
 public class GithubClientConfig {
 
+    public static final String VND_GITHUB_JSON = "application/vnd.github+json";
+    public static final String X_GITHUB_API_VERSION = "2022-11-28";
+
     @Bean
     public Feign.Builder githubClientFeignBuilder(
             Encoder encoder, Decoder decoder, ObjectMapper ojbectMapper) {

@@ -1,8 +1,10 @@
 package com.atipera.github.api;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import com.atipera.github.api.model.BranchResponse;
@@ -15,18 +17,22 @@ import com.atipera.github.external.model.Repository;
 public class GithubResponseMapper {
 
     public RepositoriesResponse mapRepositories(List<Repository> repositories) {
-        return RepositoriesResponse.builder()
-                .repositories(repositories.stream()
-                        .map(this::mapRepository)
-                        .collect(Collectors.toList()))
-                .build();
+        return new RepositoriesResponse(repositories.stream()
+                .map(this::mapRepository)
+                .collect(Collectors.toList()));
     }
 
     public RepositoryResponse mapRepository(Repository repository) {
-        return RepositoryResponse.builder()
-                .name(repository.getName())
-                .ownerLogin(repository.getOwner().getLogin())
-                .build();
+        if (ObjectUtils.isNotEmpty(repository.getBranches())) {
+            return new RepositoryResponse(
+                    repository.getName(),
+                    repository.getOwner().getLogin(),
+                    mapBranches(repository.getBranches()));
+        }
+        return new RepositoryResponse(
+                repository.getName(),
+                repository.getOwner().getLogin(),
+                null);
     }
 
     public List<BranchResponse> mapBranches(List<Branch> branches) {
@@ -36,10 +42,7 @@ public class GithubResponseMapper {
     }
 
     public BranchResponse mapBranch(Branch branch) {
-        return BranchResponse.builder()
-                .name(branch.getName())
-                .lastCommitSha(branch.getCommit().getSha())
-                .build();
+        return new BranchResponse(branch.getName(), branch.getCommit().getSha());
     }
 
 }

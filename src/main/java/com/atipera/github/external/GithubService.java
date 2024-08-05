@@ -12,6 +12,8 @@ import com.atipera.github.external.model.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import static com.atipera.github.external.config.GithubClientConfig.X_GITHUB_API_VERSION;
+
 @Service
 @RequiredArgsConstructor
 public class GithubService {
@@ -23,8 +25,7 @@ public class GithubService {
     public Owner getUser(String username) {
         String token = "Bearer " + githubKey;
         try {
-            return githubClient.getUser(username, token,
-                    GithubClient.X_GITHUB_API_VERSION);
+            return githubClient.getUser(username, token, X_GITHUB_API_VERSION);
         } catch (Exception e) {
             throw new GithubRestException("Error fetching github user for username: " + username);
         }
@@ -33,8 +34,25 @@ public class GithubService {
     public List<Repository> getUserRepositories(String username) {
         String token = "Bearer " + githubKey;
         try {
-            return githubClient.getUserRepositories(username, token,
-                    GithubClient.X_GITHUB_API_VERSION);
+            return githubClient.getUserRepositories(username, token, X_GITHUB_API_VERSION);
+        } catch (Exception e) {
+            throw new GithubRestException("Error fetching github repositories for username: " + username);
+        }
+    }
+
+    public List<Repository> getUserRepositoriesWithBranches(String username) {
+        String token = "Bearer " + githubKey;
+        try {
+            List<Repository> repositories = githubClient.getUserRepositories(username, token, X_GITHUB_API_VERSION);
+            repositories.forEach(repo -> {
+                if (repo.isFork()) {
+                    return;
+                }
+                List<Branch> branches = githubClient.getRepositoryBranches(username, repo.getName(), token);
+                repo.setBranches(branches);
+            });
+            return repositories;
+
         } catch (Exception e) {
             throw new GithubRestException("Error fetching github repositories for username: " + username);
         }

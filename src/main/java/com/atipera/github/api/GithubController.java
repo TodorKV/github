@@ -28,20 +28,8 @@ public class GithubController {
 
     @GetMapping(path = "/repositories/{username}")
     public ResponseEntity<RepositoriesResponse> getRepositories(@PathVariable(name = "username") String username) {
-        List<Repository> repos = githubService.getUserRepositories(username);
-
-        List<RepositoryResponse> repositoryResponses = repos.stream()
-                .filter(repo -> !repo.isFork())
-                .map(repo -> {
-                    List<Branch> branches = githubService.getRepositoryBranches(username, repo.getName());
-                    List<BranchResponse> branchResponses = githubResponseMapper.mapBranches(branches);
-                    RepositoryResponse repositoryResponse = githubResponseMapper.mapRepository(repo);
-                    repositoryResponse.setBranches(branchResponses);
-                    return repositoryResponse;
-                })
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new RepositoriesResponse(repositoryResponses));
+        List<Repository> repos = githubService.getUserRepositoriesWithBranches(username);
+        return ResponseEntity.ok(githubResponseMapper.mapRepositories(repos));
 
     }
 }
